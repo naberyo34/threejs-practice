@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="js/three.min.js"></script>
     <script src="js/loaders/MTLLoader.js"></script>
     <script src="js/loaders/OBJLoader.js"></script>
@@ -11,14 +12,13 @@
 
       function init() {
         // サイズを指定
-        const width = 960;
-        const height = 540;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
         let rot = 0; // 角度
-        let mouseX = 0; // マウス座標
 
         // レンダラーを作成
         const renderer = new THREE.WebGLRenderer({
-          canvas: document.querySelector("#myCanvas")
+          canvas: document.querySelector("#bg")
         });
         renderer.setSize(width, height);
         renderer.setClearColor(0xffffff);
@@ -28,6 +28,28 @@
 
         // カメラを作成
         const camera = new THREE.PerspectiveCamera(45, width / height);
+
+        // リサイズ関連処理
+        window.addEventListener("resize", onResize);
+
+        // 初期化のために実行
+        onResize();
+        // リサイズイベント発生時に実行
+        window.addEventListener("resize", onResize);
+
+        function onResize() {
+          // サイズを取得
+          const width = window.innerWidth;
+          const height = window.innerHeight;
+
+          // レンダラーのサイズを調整する
+          renderer.setPixelRatio(window.devicePixelRatio);
+          renderer.setSize(width, height);
+
+          // カメラのアスペクト比を正す
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+        }
 
         // 環境光を追加
         const ambientLight = new THREE.AmbientLight(0xffffff);
@@ -51,10 +73,7 @@
                 mouseX = event.pageX;
               });
 
-              // マウスのX座標がstageの何%の位置にあるかを調べ、360度で乗算
-              const targetRot = (mouseX / window.innerWidth) * 360;
-              // イージングの公式。 (目標値 - 現在地) * 減速値
-              rot += (targetRot - rot) * 0.1;
+              rot += 0.5;
               const radian = (rot * Math.PI) / 180;
               camera.position.x = 4 * Math.sin(radian);
               camera.position.z = 4 * Math.cos(radian);
@@ -69,8 +88,82 @@
         });
       }
     </script>
+    <link rel="stylesheet" type="text/css" href="css/minireset.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/common.css" />
   </head>
   <body>
-    <canvas id="myCanvas"></canvas>
+    <canvas id="bg" class="bg"></canvas>
+    <div class="main">
+      <div class="wrapper">
+        <div class="content">
+          <section>
+            <h2 class="heading">ABOUT</h2>
+            <p class="text">
+              テキストテキストテキストテキストテキストテキストテキストテキスト
+            </p>
+            <p class="text">
+              テキストテキストテキストテキストテキストテキストテキストテキスト
+            </p>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+          </section>
+          <section>
+            <h2 class="heading">ABOUT</h2>
+            <p class="text">
+              テキストテキストテキストテキストテキストテキストテキストテキスト
+            </p>
+            <p class="text">
+              テキストテキストテキストテキストテキストテキストテキストテキスト
+            </p>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+          </section>
+        </div>
+      </div>
+      <div class="wrapper wrapper--yellow">
+        <div class="content">
+          <section>
+            <h2 class="heading">WORKS</h2>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+          </section>
+          <section>
+            <h2 class="heading">WORKS</h2>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+          </section>
+        </div>
+      </div>
+      <div class="wrapper">
+        <div class="content">
+          <section>
+            <h2 class="heading">CONTACT</h2>
+            <p class="text">
+              テキストテキストテキストテキストテキストテキストテキストテキスト
+            </p>
+            <p class="text">
+              テキストテキストテキストテキストテキストテキストテキストテキスト
+            </p>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+          </section>
+          <section>
+            <h2 class="heading">CONTACT</h2>
+            <p class="text">
+              テキストテキストテキストテキストテキストテキストテキストテキスト
+            </p>
+            <p class="text">
+              テキストテキストテキストテキストテキストテキストテキストテキスト
+            </p>
+            <p class="text">テキストテキストテキストテキスト</p>
+            <p class="text">テキストテキストテキストテキスト</p>
+          </section>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

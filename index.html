@@ -13,24 +13,20 @@
         // サイズを指定
         const width = 960;
         const height = 540;
+        let rot = 0; // 角度
+        let mouseX = 0; // マウス座標
 
         // レンダラーを作成
         const renderer = new THREE.WebGLRenderer({
           canvas: document.querySelector("#myCanvas")
         });
-        renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(width, height);
 
         // シーンを作成
         const scene = new THREE.Scene();
 
         // カメラを作成
-        const camera = new THREE.PerspectiveCamera(
-          20,
-          width / height,
-        );
-        // カメラの初期座標を設定
-        camera.position.set(2, 3, 10);
+        const camera = new THREE.PerspectiveCamera(45, width / height);
 
         // 環境光を追加
         const ambientLight = new THREE.AmbientLight(0xffffff);
@@ -49,7 +45,20 @@
           objLoader.load("./models/tama.obj", function(obj) {
             const model = obj;
             const tick = () => {
-              model.rotation.y += 0.02;
+              // マウス位置取得
+              document.addEventListener("mousemove", event => {
+                mouseX = event.pageX;
+              });
+
+              // マウスのX座標がstageの何%の位置にあるかを調べ、360度で乗算
+              const targetRot = (mouseX / window.innerWidth) * 360;
+              // イージングの公式。 (目標値 - 現在地) * 減速値
+              rot += (targetRot - rot) * 0.1;
+              const radian = (rot * Math.PI) / 180;
+              camera.position.x = 4 * Math.sin(radian);
+              camera.position.z = 4 * Math.cos(radian);
+              camera.lookAt(new THREE.Vector3(0, 0, 0));
+
               renderer.render(scene, camera); // レンダリング
               requestAnimationFrame(tick);
             };

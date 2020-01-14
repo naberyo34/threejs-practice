@@ -15,6 +15,7 @@
         const width = window.innerWidth;
         const height = window.innerHeight;
         let rot = 0; // 角度
+        let scrollRate = 0; // スクロール量
 
         // レンダラーを作成
         const renderer = new THREE.WebGLRenderer({
@@ -29,15 +30,8 @@
         // カメラを作成
         const camera = new THREE.PerspectiveCamera(45, width / height);
 
-        // リサイズ関連処理
-        window.addEventListener("resize", onResize);
-
-        // 初期化のために実行
-        onResize();
-        // リサイズイベント発生時に実行
-        window.addEventListener("resize", onResize);
-
-        function onResize() {
+        // リサイズ処理
+        const onResize = () => {
           // サイズを取得
           const width = window.innerWidth;
           const height = window.innerHeight;
@@ -49,13 +43,28 @@
           // カメラのアスペクト比を正す
           camera.aspect = width / height;
           camera.updateProjectionMatrix();
-        }
+        };
+
+        // 初期化のために一度実行し、以降はリサイズイベントで発火
+        onResize();
+        window.addEventListener("resize", onResize);
+
+        // スクロール量を割合で取得する
+        const onScroll = () => {
+          const e = document.documentElement;
+          const top = e.scrollTop;
+          const diff = e.scrollHeight - e.clientHeight;
+          scrollRate = top / diff;
+          console.log(`ratio: ${scrollRate * 100} %`);
+        };
+
+        document.addEventListener("scroll", onScroll);
 
         // 環境光を追加
         const ambientLight = new THREE.AmbientLight(0xffffff);
         scene.add(ambientLight);
 
-        // モデルデータの読み込み
+        // モデルデータの読み込みとレンダリング
         const mtlLoader = new THREE.MTLLoader();
         const objLoader = new THREE.OBJLoader();
 
@@ -67,13 +76,10 @@
 
           objLoader.load("./models/tama.obj", function(obj) {
             const model = obj;
+            // tick は毎フレーム発火し、3D表示を再レンダリングする
             const tick = () => {
-              // マウス位置取得
-              document.addEventListener("mousemove", event => {
-                mouseX = event.pageX;
-              });
-
-              rot += 0.5;
+              const targetRot = scrollRate * 360;
+              rot += (targetRot - rot) * 0.1;
               const radian = (rot * Math.PI) / 180;
               camera.position.x = 4 * Math.sin(radian);
               camera.position.z = 4 * Math.cos(radian);
